@@ -6,7 +6,7 @@ import datetime
 import numpy as np
 
 
-st.title("📈 Stock Price Tracker & Visualizer")
+st.title("Stock Price Tracker & Visualizer")
 st.write("""
 This is a stock price tracker for global markets.  
 Enter a stock ticker symbol (e.g., AAPL, MSFT, TSLA) and select a time period to view historical stock data and moving averages.
@@ -19,7 +19,7 @@ start_date, end_date = st.date_input(
 )
 
 short_window = st.slider("Short-Term MA (days)", min_value=2, max_value=50, value=10)
-long_window = st.slider("Long-Term MA (days)", min_value=10, max_value=100, value=30)
+long_window = st.slider("Long-Term MA (days)", min_value=10, max_value=200, value=30)
 
 if ticker:
     try:
@@ -42,9 +42,8 @@ if ticker:
             )
             data['Position'] = data['Signal'].diff()
 
-
             # Show table
-            st.subheader("📊 Stock Data")
+            st.subheader("Stock Data")
             st.dataframe(data)
 
             # Plot
