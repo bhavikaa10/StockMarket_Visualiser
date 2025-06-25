@@ -3,4 +3,9 @@ yfinance
 pandas
 matplotlib
 numpy
+datetime
+numpy
+ta
+plotly.graph_objects
+prophet
 
