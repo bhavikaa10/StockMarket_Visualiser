@@ -4,7 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 import numpy as np
-
+import ta
+import plotly.graph_objects as go
+from prophet import Prophet
 
 st.title("Stock Price Tracker & Visualizer")
 st.write("""
@@ -82,3 +84,45 @@ if ticker:
             st.write(f"**Percentage Change:** {pct_change:.2f}%")
     except Exception as e:
         st.error(f"An error occurred: {e}")
+
+data = data.copy()
+data['RSI'] = ta.momentum.RSIIndicator(data['Close']).rsi()
+data['MACD'] = ta.trend.MACD(data['Close']).macd()
+
+fig_candle = go.Figure(data=[go.Candlestick(
+    x=data.index,
+    open=data['Open'],
+    high=data['High'],
+    low=data['Low'],
+    close=data['Close']
+)])
+st.plotly_chart(fig_candle)
+
+
+df_prophet = data[['Close']].reset_index()
+df_prophet.columns = ['ds', 'y']
+
+m = Prophet()
+m.fit(df_prophet)
+future = m.make_future_dataframe(periods=30)
+forecast = m.predict(future)
+
+st.write("### 30-Day Forecast")
+fig2 = m.plot(forecast)
+
+tickers = st.multiselect("Compare Stocks", ["AAPL", "MSFT", "GOOG", "TSLA"], default=["AAPL"])
+
+for t in tickers:
+    df = yf.download(t, start=start_date, end=end_date)['Close']
+    st.line_chart(df.rename(t))
+
+
+csv = data.to_csv().encode('utf-8')
+st.download_button(
+    "Download CSV",
+    csv,
+    "stock_data.csv",
+    "text/csv",
+    key='download-csv'
+)
+
